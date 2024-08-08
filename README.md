@@ -1,0 +1,1 @@
+# This is coffeeshop page using javascript with DOM API. It might not include any framework to support this site.
