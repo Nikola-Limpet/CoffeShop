@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
+    <meta name="theme-color" content="">
     <title>Coffee Masters</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
@@ -10,13 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 
-    <script src="app.js" defer type="module"></script>
-
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="app.webmanifest">
     <link rel="apple-touch-icon" href="images/icons/icon.png">
     <link rel="icon" href="images/icons/icon.png">
-    <link rel="preload" href="components/DetailsPage.css" as="stylesheet">
+
+    <script src="app.js" type="module"></script>
 </head>
 
 <body>
@@ -75,7 +75,7 @@
             <h2></h2>
             <a></a>
         </header>
-        <img src="">
+        <img src="" part="image">
         <p class="description"></p>
         <p class="price"></p>
         <button>Add to cart</button>
@@ -83,9 +83,9 @@
 
     <template id="cart-item-template">
         <li>
-            <p class='qty'></p>
-            <p class='name'></p>
-            <p class='price'></p>
+            <p class='qty'>${qty}</p>
+            <p class='name'>${name}</p>
+            <p class='price'>${price}</p>
             <p class='toolbar'>
                 <a href="#" class="delete-button">
                     🗑️

@@ -1,10 +1,9 @@
 const API = {
-  url: "data/menu.json",
+  url: "/data/menu.json",
   fetchMenu: async () => {
-    const response = await fetch(API.url); 
-    const data = await response.json();
-    return data;
-  },
-} 
+      const result = await fetch(API.url);
+      return await result.json();
+  }
+}
 
 export default API;

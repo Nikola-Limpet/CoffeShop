@@ -1,57 +1,67 @@
 const Router = {
-  init: ()  => {
-    document.querySelectorAll('.navlink').forEach(navlink => {
-      navlink.addEventListener('click', (event) => {
-        event.preventDefault();
-        // prevent the default action of the link from happening (i.e. navigating to a new page)
-        const url = event.target.getAttribute('href');
-        // get the href attribute of the link that was clicked
-        Router.go(url);
+  init: () => {
+      document.querySelectorAll("a.navlink").forEach(a => {
+          a.addEventListener("click", event => {
+              event.preventDefault();
+              const href = event.target.getAttribute("href");
+              Router.go(href);
+          });
+      });  
+      // It listen for history changes
+      window.addEventListener('popstate',  event => {
+          Router.go(event.state.route, false);
       });
-
-    });
-    window.addEventListener('popstate', (event) => {
-      // Check the state of the browser
-      const route = event.state.route;
-      if (route) {
-        Router.go(route, false);
+      // Process initial URL   
+      Router.go(location.pathname);
+  },    
+  go: async (route, addToHistory=true) => {
+      if (addToHistory) {
+          history.pushState({ route }, '', route);
       }
-    });
-    // Check the initial URL of the page
-    Router.go(location.pathname);
-  },
-  go: (route, addToHistory=true) => {
+      let pageElement = null;
+      switch (route) {
+          case "/":
+              pageElement = document.createElement("menu-page");
+              Router.setMetadata("Menu", "#43281C");
+              break;
+          case "/order":
+              // Lazy Load
+              await import("../components/OrderPage.js");
+              pageElement = document.createElement("order-page");
+              Router.setMetadata("Order", "blue")
+              break;
+          default:
+              if (route.startsWith("/product-")) {                
+                  pageElement = document.createElement("details-page");
+                  pageElement.dataset.productId = route.substring(route.lastIndexOf("-")+1);
+                  Router.setMetadata("Details", "green")
+              }
+              break;   
+      }
+      if (pageElement) {
+          function changePage() {
+              // get current page element            
+              let currentPage = document.querySelector("main").firstElementChild; 
+              if (currentPage) {                
+                  currentPage.remove();
+                  document.querySelector("main").appendChild(pageElement);
+              } else {
+                  document.querySelector("main").appendChild(pageElement);
+              }
+          }
+          if (!document.startViewTransition) {
+              changePage();                
+          } else {
+              document.startViewTransition(() => changePage());
+          }
 
-    console.log('Navigating to:', route);
-    
-    if (addToHistory) {
-      history.pushState({ route }, '', route);
-    }
-    let pageElement  = null;
-    switch (route) {
-      case '/':
-        pageElement = document.createElement('menu-page');
-        break;
-      case '/order':
-        pageElement = document.createElement('order-page');
-        break;
-      
-      default:
-        if (route.startsWith('/product-')) {
-          pageElement = document.createElement('h1');
-          pageElement.textContent = 'Detials';
-          const paramId = route.substring(route.lastIndexOf('-') + 1);
-          pageElement.dataset.id = paramId;
-        }
-    }
-    if (pageElement) {
-    // const cache = document.querySelector('main').children[0].remove();
-    const cache = document.querySelector('main');
-    cache.innerHTML = '';
-    cache.appendChild(pageElement);
-    window.scrollX = 0;
-    window.scrollY = 0;
-    }
+      }
+
+      window.scrollX = 0;
+  },
+  setMetadata(section, color) {
+      document.title = `${section} - Coffee Masters`;
+      document.querySelector("meta[name=theme-color]").content = color;
   }
 }
 

@@ -1,35 +1,54 @@
-export class MenuPage extends HTMLElement {
+import API from '../services/API.js';
+import ProductItem  from './ProductItem.js';
+
+export default class MenuPage extends HTMLElement {
     constructor() {
-      super();
-      // Create a shadow root
-      // A shadow root is a part of the custom element that is not accessible from the outside
-      this.attachShadow({ mode: 'open' });
+        super();
+    
+        this.root = this.attachShadow({ mode: "open" });
+    
+        const template = document.getElementById("menu-page-template");
+        const content = template.content.cloneNode(true);
+        const styles = document.createElement("style");
+        this.root.appendChild(content);    
+        this.root.appendChild(styles);
 
-      const styles = document.createElement('style');
-      this.shadowRoot.appendChild(styles);
+        async function loadCSS() {
+          const request = await fetch("/components/MenuPage.css");
+          styles.textContent = await request.text();
+        }
+        loadCSS();
+    }   
 
-
-      async function loadCSS () {
-        const req = await fetch('components/MenuPage.css');
-        const text = await req.text(); // returns a promise of the response body as text
-        styles.textContent = text; 
-        // The textContent property sets or returns the text content of the specified node, and all its descendants.
-      }
-      loadCSS();
-
-    }
-    // The connectedCallback() method is called when the custom element is added to the DOM
-    // when the component is attached to the DOM
     connectedCallback() {
-      // Create a new template element
-      // Clone the template's content and append it to the shadow root of the custom element
-      // The shadow root is a part of the custom element that is not accessible from the outside
-      const template = document.getElementById('menu-page-template');
-      const templateContent = template.content.cloneNode(true);
-      this.shadowRoot.appendChild(templateContent);
-
+      this.render();
+      window.addEventListener("appmenuchange", () => {
+        this.render();
+      });
     }
+
+    render() {
+      if (app.store.menu) {
+        this.root.querySelector("#menu").innerHTML = "";
+        for (let category of app.store.menu) {
+          const liCategory = document.createElement("li");
+          liCategory.innerHTML = `
+                <h3>${category.name}</h3>
+                <ul class='category'>
+                </ul>`;
+          this.root.querySelector("#menu").appendChild(liCategory);
+
+          category.products.map(product => {
+              const item = document.createElement("product-item");
+              item.dataset.product = JSON.stringify(product);
+              liCategory.querySelector("ul").appendChild(item);
+          });
+        }  
+      } else {
+        this.root.querySelector("#menu").innerHTML = `Loading...`;
+      }
+    }
+
 }
 
-// Define the new element in the customElements registry using the customElements.define() method
-customElements.define('menu-page', MenuPage);
+customElements.define("menu-page", MenuPage);
